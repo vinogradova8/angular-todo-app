@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 
 const todos = [
@@ -18,21 +25,44 @@ interface Todo {
 
 @Component({
   selector: 'app-root',
-  // imports: [RouterOutlet],
-  imports: [RouterOutlet, CommonModule, FormsModule],
+  imports: [RouterOutlet, CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'angular-todo-app';
   todos = todos;
   editing = false;
+  todoForm = new FormGroup({
+    title: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(3)],
+    }),
+  });
 
-  handleTodoToggle(event: Event, todo: Todo) {
-    todo.completed = (event.target as HTMLInputElement).checked;
-  }
+  // handleTodoToggle(event: Event, todo: Todo) {
+  //   todo.completed = (event.target as HTMLInputElement).checked;
+  // }
 
   get activeTodos() {
-    return this.todos.filter(todo => !todo.completed);
+    return this.todos.filter((todo) => !todo.completed);
+  }
+
+  get title() {
+    return this.todoForm.get("title") as FormControl;
+  }
+
+  addTodo() {
+    if (this.todoForm.invalid) {
+      return;
+    }
+
+    const newTodo: Todo = {
+      id: Date.now(),
+      title: this.title.value,
+      completed: false,
+    };
+
+    this.todos.push(newTodo);
+    this.todoForm.reset();
   }
 }
