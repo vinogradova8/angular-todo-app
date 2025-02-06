@@ -1,5 +1,5 @@
 <div class="todoapp">
-  <h1 class="todoapp__title">todos</h1>
+  <h1 class="todoapp__title">todos {{ todos.length }}</h1>
 
   <div class="todoapp__content">
     <header class="todoapp__header">
@@ -23,57 +23,22 @@
 
     <article class="todoapp__main" data-cy="TodoList">
       <!-- {/* This is a completed todo */} -->
-      <div data-cy="Todo" class="todo completed">
+      <div
+        data-cy="Todo"
+        class="todo"
+        [class]="{ completed: todo.completed }"
+        *ngFor="let todo of todos; let i = index"
+      >
         <label class="todo__status-label">
           <input
             data-cy="TodoStatus"
             type="checkbox"
             class="todo__status"
-            checked
+            [(ngModel)]="todo.completed"
           />
         </label>
 
-        <span data-cy="TodoTitle" class="todo__title"> Completed Todo </span>
-
-        <!-- {/* Remove button appears only on hover */} -->
-        <button type="button" class="todo__remove" data-cy="TodoDelete">
-          ×
-        </button>
-
-        <!-- {/* overlay will cover the todo while it is being deleted or updated */} -->
-        <div data-cy="TodoLoader" class="modal overlay">
-          <div class="modal-background has-background-white-ter"></div>
-          <div class="loader"></div>
-        </div>
-      </div>
-
-      <!-- {/* This todo is an active todo */} -->
-      <div data-cy="Todo" class="todo">
-        <label class="todo__status-label">
-          <input data-cy="TodoStatus" type="checkbox" class="todo__status" />
-        </label>
-
-        <span data-cy="TodoTitle" class="todo__title">
-          Not Completed Todo
-        </span>
-        <button type="button" class="todo__remove" data-cy="TodoDelete">
-          ×
-        </button>
-
-        <div data-cy="TodoLoader" class="modal overlay">
-          <div class="modal-background has-background-white-ter"></div>
-          <div class="loader"></div>
-        </div>
-      </div>
-
-      <!-- {/* This todo is being edited */} -->
-      <div data-cy="Todo" class="todo">
-        <label class="todo__status-label">
-          <input data-cy="TodoStatus" type="checkbox" class="todo__status" />
-        </label>
-
-        <!-- {/* This form is shown instead of the title and remove button */} -->
-        <form>
+        <form *ngIf="editing">
           <input
             data-cy="TodoTitleField"
             type="text"
@@ -83,28 +48,27 @@
           />
         </form>
 
-        <div data-cy="TodoLoader" class="modal overlay">
-          <div class="modal-background has-background-white-ter"></div>
-          <div class="loader"></div>
-        </div>
-      </div>
+        <ng-container *ngIf="!editing">
+          <span *ngIf="true" data-cy="TodoTitle" class="todo__title">
+            {{ todo.title }}
+          </span>
 
-      <!-- {/* This todo is in loadind state */} -->
-      <div data-cy="Todo" class="todo">
-        <label class="todo__status-label">
-          <input data-cy="TodoStatus" type="checkbox" class="todo__status" />
-        </label>
+          <button
+            type="button"
+            class="todo__remove"
+            data-cy="TodoDelete"
+            (click)="todos.splice(i, 1)"
+          >
+            ×
+          </button>
+        </ng-container>
 
-        <span data-cy="TodoTitle" class="todo__title">
-          Todo is being saved now
-        </span>
-
-        <button type="button" class="todo__remove" data-cy="TodoDelete">
-          ×
-        </button>
-
-        <!-- {/* 'is-active' class puts this modal on top of the todo */} -->
-        <div data-cy="TodoLoader" class="modal overlay is-active">
+        <!-- {/* overlay will cover the todo while it is being deleted or updated */} -->
+        <div
+          data-cy="TodoLoader"
+          class="modal overlay"
+          [class.is-active]="false"
+        >
           <div class="modal-background has-background-white-ter"></div>
           <div class="loader"></div>
         </div>
@@ -113,7 +77,7 @@
 
     <!-- {/* Hide the footer if there are no todos */} -->
     <footer class="todoapp__footer" data-cy="Footer">
-      <span class="todo-count" data-cy="TodosCounter"> 3 items left </span>
+      <span class="todo-count" data-cy="TodosCounter"> {{activeTodos.length}} items left </span>
 
       <!-- {/* Active link should have the 'selected' class */} -->
       <nav class="filter" data-cy="Filter">
