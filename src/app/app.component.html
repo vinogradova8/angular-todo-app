@@ -23,60 +23,14 @@
     </header>
 
     <article class="todoapp__main" data-cy="TodoList">
-      <!-- {/* This is a completed todo */} -->
-      <div
-        data-cy="Todo"
-        class="todo"
-        [class]="{ completed: todo.completed }"
+      <app-todo
         *ngFor="let todo of todos; let i = index"
+        [todo]="todo"
+        (delete)="todos.splice(i, 1)"
       >
-        <label class="todo__status-label">
-          <input
-            data-cy="TodoStatus"
-            type="checkbox"
-            class="todo__status"
-            [(ngModel)]="todo.completed"
-          />
-        </label>
-
-        <form *ngIf="editing">
-          <input
-            data-cy="TodoTitleField"
-            type="text"
-            class="todo__title-field"
-            placeholder="Empty todo will be deleted"
-            value="Todo is being edited now"
-          />
-        </form>
-
-        <ng-container *ngIf="!editing">
-          <span *ngIf="true" data-cy="TodoTitle" class="todo__title">
-            {{ todo.title }}
-          </span>
-
-          <button
-            type="button"
-            class="todo__remove"
-            data-cy="TodoDelete"
-            (click)="todos.splice(i, 1)"
-          >
-            ×
-          </button>
-        </ng-container>
-
-        <!-- {/* overlay will cover the todo while it is being deleted or updated */} -->
-        <div
-          data-cy="TodoLoader"
-          class="modal overlay"
-          [class.is-active]="false"
-        >
-          <div class="modal-background has-background-white-ter"></div>
-          <div class="loader"></div>
-        </div>
-      </div>
+      </app-todo>
     </article>
 
-    <!-- {/* Hide the footer if there are no todos */} -->
     <footer class="todoapp__footer" data-cy="Footer">
       <span class="todo-count" data-cy="TodosCounter">
         {{ activeTodos.length }} items left
