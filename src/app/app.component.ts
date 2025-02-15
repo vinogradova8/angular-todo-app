@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormControl,
@@ -23,10 +23,10 @@ const todos = [
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
-[x: string]: any;
+export class AppComponent implements OnInit {
+  [x: string]: any;
   todos = todos;
-  
+
   todoForm = new FormGroup({
     title: new FormControl('', {
       nonNullable: true,
@@ -43,7 +43,15 @@ export class AppComponent {
   }
 
   get title() {
-    return this.todoForm.get("title") as FormControl;
+    return this.todoForm.get('title') as FormControl;
+  }
+
+  constructor() {}
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.todos[1] = { ...this.todos[1], title: 'qwerty' };
+    }, 3000);
   }
 
   addTodo() {
@@ -60,4 +68,8 @@ export class AppComponent {
     this.todos.push(newTodo);
     this.todoForm.reset();
   }
+
+  trackById(i: number, todo: Todo) {
+    return todo.id;
+  };
 }
