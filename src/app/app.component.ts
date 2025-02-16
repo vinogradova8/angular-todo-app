@@ -9,8 +9,10 @@ import {
 } from '@angular/forms';
 import { TodoComponent } from './components/todo/todo.component';
 import { Todo } from './types/todo';
+import { TodoFormComponent } from "./components/todo-form/todo-form.component";
+import { FilterActivePipe } from "./pipes/filter-active.pipe";
 
-const todos = [
+const todosFromServer = [
   { id: 1, title: 'HTML + CSS', completed: true },
   { id: 2, title: 'JS', completed: false },
   { id: 3, title: 'React', completed: false },
@@ -19,42 +21,29 @@ const todos = [
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TodoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TodoComponent,
+    TodoFormComponent,
+    FilterActivePipe,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  [x: string]: any;
-  todos = todos;
-
-  todoForm = new FormGroup({
-    title: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3)],
-    }),
-  });
+  // [x: string]: any;
+  todos: Todo[] = todosFromServer;
 
   // handleTodoToggle(event: Event, todo: Todo) {
   //   todo.completed = (event.target as HTMLInputElement).checked;
   // }
 
-  get activeTodos() {
-    return this.todos.filter((todo) => !todo.completed);
-  }
-
-  get title() {
-    return this.todoForm.get('title') as FormControl;
-  }
-
-  handleFormSubmit() {
-    if (this.todoForm.invalid) {
-      return;
-    }
-
-    this.addTodo(this.title.value);
-    this.todoForm.reset();
-  }
+  // get activeTodos() {
+  //   return this.todos.filter((todo) => !todo.completed);
+  // }
 
   addTodo(newTitle: string) {
     const newTodo: Todo = {
@@ -87,7 +76,7 @@ export class AppComponent {
   }
 
   deleteTodo(todoId: number) {
-    this.todos = this.todos.filter(todo => todo.id !== todoId);
+    this.todos = this.todos.filter((todo) => todo.id !== todoId);
   }
 
   trackById(i: number, todo: Todo) {
