@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormControl,
@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { TodoComponent } from "./components/todo/todo.component";
+import { TodoComponent } from './components/todo/todo.component';
 import { Todo } from './types/todo';
 
 const todos = [
@@ -22,8 +22,9 @@ const todos = [
   imports: [CommonModule, FormsModule, ReactiveFormsModule, TodoComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   [x: string]: any;
   todos = todos;
 
@@ -46,30 +47,50 @@ export class AppComponent implements OnInit {
     return this.todoForm.get('title') as FormControl;
   }
 
-  constructor() {}
-
-  ngOnInit(): void {
-    setTimeout(() => {
-      this.todos[1] = { ...this.todos[1], title: 'qwerty' };
-    }, 3000);
-  }
-
-  addTodo() {
+  handleFormSubmit() {
     if (this.todoForm.invalid) {
       return;
     }
 
+    this.addTodo(this.title.value);
+    this.todoForm.reset();
+  }
+
+  addTodo(newTitle: string) {
     const newTodo: Todo = {
       id: Date.now(),
-      title: this.title.value,
+      title: newTitle,
       completed: false,
     };
 
-    this.todos.push(newTodo);
-    this.todoForm.reset();
+    this.todos = [...this.todos, newTodo];
+  }
+
+  renameTodo(id: number, newTitle: string) {
+    this.todos = this.todos.map((todo) => {
+      if (todo.id !== id) {
+        return todo;
+      }
+
+      return { ...todo, title: newTitle };
+    });
+  }
+
+  toggleTodo(todoId: number) {
+    this.todos = this.todos.map((todo) => {
+      if (todo.id !== todoId) {
+        return todo;
+      }
+
+      return { ...todo, completed: !todo.completed };
+    });
+  }
+
+  deleteTodo(todoId: number) {
+    this.todos = this.todos.filter(todo => todo.id !== todoId);
   }
 
   trackById(i: number, todo: Todo) {
     return todo.id;
-  };
+  }
 }
