@@ -9,15 +9,9 @@ import {
 } from '@angular/forms';
 import { TodoComponent } from './components/todo/todo.component';
 import { Todo } from './types/todo';
-import { TodoFormComponent } from "./components/todo-form/todo-form.component";
-import { FilterActivePipe } from "./pipes/filter-active.pipe";
-
-const todosFromServer = [
-  { id: 1, title: 'HTML + CSS', completed: true },
-  { id: 2, title: 'JS', completed: false },
-  { id: 3, title: 'React', completed: false },
-  { id: 4, title: 'Vue.js', completed: true },
-];
+import { TodoFormComponent } from './components/todo-form/todo-form.component';
+import { FilterActivePipe } from './pipes/filter-active.pipe';
+import { TodosService } from './services/todos.service';
 
 @Component({
   selector: 'app-root',
@@ -33,9 +27,9 @@ const todosFromServer = [
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   // [x: string]: any;
-  todos: Todo[] = todosFromServer;
+  todos: Todo[] = [];
 
   // handleTodoToggle(event: Event, todo: Todo) {
   //   todo.completed = (event.target as HTMLInputElement).checked;
@@ -44,6 +38,12 @@ export class AppComponent {
   // get activeTodos() {
   //   return this.todos.filter((todo) => !todo.completed);
   // }
+
+  constructor(private todosService: TodosService) {}
+
+  ngOnInit(): void {
+    this.todos = this.todosService.getTodos();
+  }
 
   addTodo(newTitle: string) {
     const newTodo: Todo = {
