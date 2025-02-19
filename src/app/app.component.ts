@@ -1,12 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TodoComponent } from './components/todo/todo.component';
 import { Todo } from './types/todo';
 import { TodoFormComponent } from './components/todo-form/todo-form.component';
@@ -25,34 +19,31 @@ import { TodosService } from './services/todos.service';
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
-  // [x: string]: any;
   todos: Todo[] = [];
-
-  // handleTodoToggle(event: Event, todo: Todo) {
-  //   todo.completed = (event.target as HTMLInputElement).checked;
-  // }
-
-  // get activeTodos() {
-  //   return this.todos.filter((todo) => !todo.completed);
-  // }
 
   constructor(private todosService: TodosService) {}
 
   ngOnInit(): void {
-    this.todos = this.todosService.getTodos();
+    this.todosService.getTodos().subscribe((todos) => {
+      console.log(todos);
+      this.todos = todos;
+    });
+  }
+
+  loadTodos() {
+    this.todosService.getTodos()
+      .subscribe((todos) => {
+        this.todos = todos;
+      })
   }
 
   addTodo(newTitle: string) {
-    const newTodo: Todo = {
-      id: Date.now(),
-      title: newTitle,
-      completed: false,
-    };
-
-    this.todos = [...this.todos, newTodo];
+    this.todosService.createTodo(newTitle).subscribe((newTodo) => {
+      this.todos = [...this.todos, newTodo];
+    });
   }
 
   renameTodo(id: number, newTitle: string) {
