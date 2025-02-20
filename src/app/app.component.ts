@@ -27,47 +27,43 @@ export class AppComponent implements OnInit {
   constructor(private todosService: TodosService) {}
 
   ngOnInit(): void {
-    this.todosService.getTodos().subscribe((todos) => {
-      console.log(todos);
+    this.todosService.todos$.subscribe((todos) => {
       this.todos = todos;
     });
   }
 
-  loadTodos() {
-    this.todosService.getTodos()
-      .subscribe((todos) => {
-        this.todos = todos;
-      })
-  }
+  // loadTodos() {
+  //   this.todosService.todos$
+  //     .subscribe((todos) => {
+  //       this.todos = todos;
+  //     })
+  // }
 
   addTodo(newTitle: string) {
-    this.todosService.createTodo(newTitle).subscribe((newTodo) => {
-      this.todos = [...this.todos, newTodo];
-    });
+    this.todosService.createTodo(newTitle).subscribe();
   }
 
-  renameTodo(id: number, newTitle: string) {
-    this.todos = this.todos.map((todo) => {
-      if (todo.id !== id) {
-        return todo;
-      }
+  renameTodo(todo: Todo, title: string) {
+    this.todosService.updateTodo({ ...todo, title })
+      .subscribe();
+    // this.todos = this.todos.map((todo) => {
+    //   if (todo.id !== id) {
+    //     return todo;
+    //   }
 
-      return { ...todo, title: newTitle };
-    });
+    //   return { ...todo, title: newTitle };
+    // });
   }
 
-  toggleTodo(todoId: number) {
-    this.todos = this.todos.map((todo) => {
-      if (todo.id !== todoId) {
-        return todo;
-      }
-
-      return { ...todo, completed: !todo.completed };
-    });
+  toggleTodo(todo: Todo) {
+    this.todosService.updateTodo({ ...todo, completed: !todo.completed })
+      .subscribe();
   }
 
-  deleteTodo(todoId: number) {
-    this.todos = this.todos.filter((todo) => todo.id !== todoId);
+  deleteTodo(todo: Todo) {
+    // this.todos = this.todos.filter((todo) => todo.id !== todoId);
+
+    this.todosService.deleteTodo(todo).subscribe();
   }
 
   trackById(i: number, todo: Todo) {
